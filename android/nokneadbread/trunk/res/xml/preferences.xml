@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+	<CheckBoxPreference android:key="notification"
+		android:defaultValue="true" android:title="@string/notif_pref_title" android:summary="@string/notif_pref_sum"></CheckBoxPreference>
+	<CheckBoxPreference android:key="alarm"
+		android:defaultValue="false" android:summary="@string/alarm_pref_sum" android:title="@string/alarm_pref_title"></CheckBoxPreference>
+    
+    
+</PreferenceScreen>

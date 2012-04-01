@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+	<string name="app_name">No Knead Bread</string>
+	<string-array name="step_labels">
+		<item>Start Mix</item>
+		<item>Start Rise 1</item>
+		<item>Start Rise 2</item>
+		<item>Start Rise 3</item>
+		<item>Heat Oven</item>
+		<item>Start Bake</item>
+		<item>Remove Lid</item>
+		<item>Done</item>
+	</string-array>
+	<string-array name="instructions"></string-array>
+	<string name="recipe"></string>
+	<string name="countdown_label">Time to next step</string>
+	<string name="countdown_default">00:00:00</string>
+	<string name="notif_pref_title">Show Notification</string>
+	<string name="notif_pref_sum">Show icon on notification bar to switch easily
+	</string>
+	<string name="alarm_pref_title">Timer Alarm</string>
+	<string name="alarm_pref_sum">Sound an alarm when it is time for the next step
+	</string>
+	<string-array name="delta_pref_titles">
+		<item>Time for Mix</item>
+	</string-array>
+	<string-array name="delta_pref_sums"></string-array>
+</resources>
