@@ -1,18 +1,42 @@
 package com.builditboys.misc.units;
 
+import java.util.EnumMap;
+import java.util.Map;
+import static com.builditboys.misc.units.TimeUnits.*;
+import static com.builditboys.misc.units.LengthUnits.*;
+import static com.builditboys.misc.units.VolumeUnits.*;
+import static com.builditboys.misc.units.AngleUnits.*;
+import static com.builditboys.misc.units.WeightUnits.*;
+
 public abstract class AbstractUnit {
 
 	public static enum UnitKindEnum { 
-		LENGTH,
-		MASS,
-		TIME,
-		ANGLE,
-		WEIGHT,
-		VOLUME,
-		VELOCITY,
-		ANGULAR_VELOCITY,
-		POWER,
-		ENERGY };
+		TIME(SECOND),
+		LENGTH(METER),
+		AREA(null),
+		VOLUME(LITER),
+		MASS(null),
+		WEIGHT(KILOGRAM),
+		ANGLE(RADIAN),
+		VELOCITY(null),
+		ANGULAR_VELOCITY(null),
+		POWER(null),
+		ENERGY(null);
+		
+		public final AbstractUnit baseUnit;
+		
+		UnitKindEnum (AbstractUnit baseUnit) {
+			this.baseUnit = baseUnit;
+		}	
+	};
+		
+	public static Map<UnitKindEnum, AbstractUnit> unitKindToBaseUnitMap = new EnumMap<UnitKindEnum, AbstractUnit>(UnitKindEnum.class);
+
+	static {
+		unitKindToBaseUnitMap.put(UnitKindEnum.TIME, SECOND);
+	}
+	
+	//--------------------------------------------------------------------------------
 	
 	// The name of the unit
 	public final String name;
@@ -31,12 +55,15 @@ public abstract class AbstractUnit {
 	
 	// The conversion factor converts to this
 	public final AbstractUnit baseUnit;
-
-
+	
+	
+	// The conversion factor from the unit to its base unit; computed on demand
+	private double baseConversionFactor;
+	
 	//--------------------------------------------------------------------------------
 
 	public AbstractUnit (String name, String plural, String abbreviation,
-				  UnitKindEnum kind, double conversionFactor, AbstractUnit baseUnit) {
+				         UnitKindEnum kind, double conversionFactor, AbstractUnit baseUnit) {
 		this.name = name;
 		this.plural = plural;
 		this.abbreviation = abbreviation;
@@ -47,17 +74,12 @@ public abstract class AbstractUnit {
 	
 	//--------------------------------------------------------------------------------
 
-	public String getName() {
-		return name;
-	}
-	
-	public double getConversionFactor() {
-		return conversionFactor;
-	}
-
-	//--------------------------------------------------------------------------------
-
 	public static double convert (double val, AbstractUnit fromUnit, AbstractUnit toUnit) {
+		if (fromUnit.kind != toUnit.kind) {
+			throw new IllegalArgumentException("Units are different kinds: "
+											   + fromUnit + " " + toUnit);
+		}
+		
 		// same unit, no conversion necessary
 		if (fromUnit == toUnit) {
 			return val;
@@ -89,6 +111,11 @@ public abstract class AbstractUnit {
 	}
 	
 	public static long convert (long val, AbstractUnit fromUnit, AbstractUnit toUnit) {
+		if (fromUnit.kind != toUnit.kind) {
+			throw new IllegalArgumentException("Units are different kinds: "
+											   + fromUnit + " " + toUnit);
+		}
+
 		// same unit, no conversion necessary
 		if (fromUnit == toUnit) {
 			return val;
@@ -120,6 +147,11 @@ public abstract class AbstractUnit {
 	}
 
 	public static int convert (int val, AbstractUnit fromUnit, AbstractUnit toUnit) {
+		if (fromUnit.kind != toUnit.kind) {
+			throw new IllegalArgumentException("Units are different kinds: "
+											   + fromUnit + " " + toUnit);
+		}
+
 		// same unit, no conversion necessary
 		if (fromUnit == toUnit) {
 			return val;

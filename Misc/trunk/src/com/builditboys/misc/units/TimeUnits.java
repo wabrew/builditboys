@@ -4,74 +4,38 @@ package com.builditboys.misc.units;
 public class TimeUnits extends AbstractUnit {
 
 	public static final TimeUnits SECOND =      
-			new TimeUnits("second", "seconds", "sec", 1.0E6);
+			new TimeUnits("second", "seconds", "sec", 1.0, null);
 
-	public static final TimeUnits MILLISECONDS = 
-			new TimeUnits("millisecond", "milliseconds", "msec", 1.0E3);
+	public static final TimeUnits MILLISECOND = 
+			new TimeUnits("millisecond", "milliseconds", "msec", 1.0E-3, SECOND);
 
-	public static final TimeUnits MICROSECONDS = 
-			new TimeUnits("microsecond", "microseconds", "usec", 1.0);
+	public static final TimeUnits MICROSECOND = 
+			new TimeUnits("microsecond", "microseconds", "usec", 1.0E-6, SECOND);
 
-	public static final TimeUnits NANOSECONDS = 
-			new TimeUnits("nanosecond", "nanoseconds", "nsec", 1.0E-3);
+	public static final TimeUnits NANOSECOND = 
+			new TimeUnits("nanosecond", "nanoseconds", "nsec", 1.0E-9, SECOND);
 	
 	public static final TimeUnits MINUTE =      
-			new TimeUnits("minute", "minutess", "min", 60.0 * 1.0E6);
+			new TimeUnits("minute", "minutess", "min", 60.0, SECOND);
 	
 	public static final TimeUnits HOUR =      
-			new TimeUnits("hour", "hours", "hr", 60.0 * 60.0 * 1.0E6);
+			new TimeUnits("hour", "hours", "hr", 60.0 * 60.0, SECOND);
 	
 	public static final TimeUnits DAY =      
-			new TimeUnits("day", "days", "dy", 60.0 * 60.0 * 24 * 1.0E6);
+			new TimeUnits("day", "days", "dy", 24.0, HOUR);
 	
 	public static final TimeUnits YEAR =      
-			new TimeUnits("year", "years", "yr", 60.0 * 60.0 * 24 * 365.25 * 1.0E6);
+			new TimeUnits("year", "years", "yr", 365.25, DAY);
 	
-
-	
-	
-	public static final TimeUnits ABSOLUTES =    
-			new TimeUnits("absolute", "absolutes", "abst", 1.0E3);
-
-	public static final TimeUnits LOCALS =      
-			new TimeUnits("local", "locals", "loct", 1.0E3);
-	
-
-	
-	public static final TimeUnits BASE_UNIT = MILLISECONDS;
-
-	
-	// not a final but pretty close, you can set the base unit but you
-	// should then lock it
-	private static TimeUnits defaultUnit = BASE_UNIT;
-	private static boolean defaultUnitLocked = false;
 	
 	//--------------------------------------------------------------------------------
     // Constructor
 	
-	private TimeUnits (String name, String plural, String abbreviation, double conversionFactor) {
+	private TimeUnits (String name, String plural, String abbreviation,
+					   double conversionFactor, AbstractUnit baseUnit) {
 		super(name, plural, abbreviation,
-			  UnitKindEnum.TIME, conversionFactor, BASE_UNIT);
+			  UnitKindEnum.TIME, conversionFactor, baseUnit);
 	}
 	
-	//--------------------------------------------------------------------------------
-
-	public static TimeUnits getDefaultUnit() {
-		return defaultUnit;
-	}
-
-	public static void setDefaultUnit(TimeUnits defaultTimeUnit) {
-		if (!defaultUnitLocked) {
-			TimeUnits.defaultUnit = defaultTimeUnit;
-		}
-		else {
-			throw new IllegalStateException("Default time unit is locked");
-		}
-	}
-	
-	public static void lockDefaultUnit () {
-		defaultUnitLocked = true;
-	}
-
 }
 
