@@ -2,14 +2,22 @@ package com.builditboys.misc.planning;
 
 public class ResourceClaim {
 	
-	ResourceInterface resource;
+	double amount;
 	
-	int count;
+	String resourceName;
 	
-	ResourcePool fullfillingPool;
-	
-	String getName() {
-		return resource.getName();
-	}
 
+	
+	ResourceInterface resource;	
+
+	ResourcePool fullfillingPool;
+
+	// --------------------------------------------------------------------------------
+
+	public ResourceClaim(String resourceName, double amount) {
+		super();
+		this.resourceName = resourceName;
+		this.amount = amount;
+	}
+	
 }

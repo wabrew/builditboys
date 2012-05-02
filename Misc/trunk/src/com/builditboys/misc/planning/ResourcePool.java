@@ -2,12 +2,14 @@ package com.builditboys.misc.planning;
 
 public class ResourcePool {
 	
-	int availableUnits;
+	String resourceName;
+		
+	double amount;
+	
+	
 	
 	ResourceInterface resource;
 	
-	String getName () {
-		return resource.getName();
-	}
+	// --------------------------------------------------------------------------------
 
 }

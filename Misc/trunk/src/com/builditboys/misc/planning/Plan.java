@@ -49,9 +49,9 @@ public class Plan {
 	String name;
 	String description;
 
-	Set<Task> userTasks = new HashSet<Task>();
+	List<Task> userTasks = new ArrayList<Task>();
 	
-	Collection<ResourcePool> resourcePools = new LinkedList<ResourcePool>();
+	List<ResourcePool> resourcePools = new ArrayList<ResourcePool>();
 	
 	
 
@@ -69,18 +69,18 @@ public class Plan {
 
 	boolean isSetUp = false;
 
-	boolean isCalculated;
+	boolean isCalculated = false;
 	
 	Task pinnedTask;
 
-	List<Task> taskSchedule = new LinkedList<Task>();
+	List<Task> taskSchedule = new ArrayList<Task>();
 
-	List<Task> activeTaskSchedule = new LinkedList<Task>();
+	List<Task> activeTaskSchedule = new ArrayList<Task>();
 
 	// ----------
 	// Internals
 	
-	Set<Task> allTasks = new HashSet<Task>();
+	Collection<Task> allTasks = new ArrayList<Task>();
 	
 	Map<String, Task> taskLookup = new HashMap<String, Task>();
 	Map<String, ResourcePool> resourcePoolLookup = new HashMap<String, ResourcePool>();
@@ -129,11 +129,11 @@ public class Plan {
 	// --------------------------------------------------------------------------------
 	// Getting, adding and removing tasks
 	
-	public Set<Task> getTasks() {
+	public List<Task> getTasks() {
 		return userTasks;
 	}
 	
-	public void setTasks (Set<Task> tasks) {
+	public void setTasks (List<Task> tasks) {
 		unSetupTasks();
 		this.userTasks = tasks;
 		handlePlanChange(PlanActionEnum.SET_TASKS);
@@ -167,24 +167,25 @@ public class Plan {
 		buildActiveTaskList();
 		return activeTaskSchedule;
 	}
-	
-	public Task getStartTask() {
-		return startTask;
-	}
 
-	public Task getFinishTask() {
-		return finishTask;
-	}
+	
+//	public Task getStartTask() {
+//		return startTask;
+//	}
+
+//	public Task getFinishTask() {
+//		return finishTask;
+//	}
 
  	// --------------------------------------------------------------------------------
 
 	// Resources
 	
-	public Collection<ResourcePool> getResourcePools() {
+	public List<ResourcePool> getResourcePools() {
 		return resourcePools;
 	}
 
-	public void setResourcePools(Collection<ResourcePool> resourcePools) {
+	public void setResourcePools(List<ResourcePool> resourcePools) {
 		unSetupResourcePools();
 		this.resourcePools = resourcePools;
 		handlePlanChange(PlanActionEnum.SET_RESOURCE_POOLS);
@@ -208,7 +209,6 @@ public class Plan {
 		return resourcePoolLookup.get(nm);
 	}
 
-
 	// --------------------------------------------------------------------------------
 	// Comparators
 	
@@ -224,63 +224,63 @@ public class Plan {
 	
 	// ----------
 	
-	public class NominalStartTimeAscendingComparator implements Comparator<Task> {
+	public static class NominalStartTimeAscendingComparator implements Comparator<Task> {
 		public int compare(Task tsk1, Task tsk2) {
 			return Plan.compareLong(tsk1.nominalStartTime, tsk2.nominalStartTime);
 		}
 	}
 	
-	public Comparator<Task> nominalStartTimeAscendingComparator = new NominalStartTimeAscendingComparator();
+	public static Comparator<Task> nominalStartTimeAscendingComparator = new NominalStartTimeAscendingComparator();
 
 	// ----------
 	
-	public class NominalFinishTimeAscendingComparator implements Comparator<Task> {
+	public static class NominalFinishTimeAscendingComparator implements Comparator<Task> {
 		public int compare(Task tsk1, Task tsk2) {
 			return Plan.compareLong(tsk1.nominalFinishTime, tsk2.nominalFinishTime);
 		}
 	}
 	
-	public Comparator<Task> nominalFinishTimeAscendingComparator = new NominalFinishTimeAscendingComparator();
+	public static Comparator<Task> nominalFinishTimeAscendingComparator = new NominalFinishTimeAscendingComparator();
 
 	// ----------
 	
-	public class EarliestStartTimeAscendingComparator implements Comparator<Task> {
+	public static class EarliestStartTimeAscendingComparator implements Comparator<Task> {
 		public int compare(Task tsk1, Task tsk2) {
 			return Plan.compareLong(tsk1.earliestStartTime, tsk2.earliestStartTime);
 		}
 	}
 	
-	public Comparator<Task> EarliestStartTimeAscendingComparator = new EarliestStartTimeAscendingComparator();
+	public static Comparator<Task> EarliestStartTimeAscendingComparator = new EarliestStartTimeAscendingComparator();
 
 	// ----------
 	
-	public class EarliestFinishTimeAscendingComparator implements Comparator<Task> {
+	public static class EarliestFinishTimeAscendingComparator implements Comparator<Task> {
 		public int compare(Task tsk1, Task tsk2) {
 			return Plan.compareLong(tsk1.earliestFinishTime, tsk2.earliestFinishTime);
 		}
 	}
 	
-	public Comparator<Task> EarliestFinishTimeAscendingComparator = new EarliestFinishTimeAscendingComparator();
+	public static Comparator<Task> EarliestFinishTimeAscendingComparator = new EarliestFinishTimeAscendingComparator();
 
 	// ----------
 	
-	public class LatestStartTimeAscendingComparator implements Comparator<Task> {
+	public static class LatestStartTimeAscendingComparator implements Comparator<Task> {
 		public int compare(Task tsk1, Task tsk2) {
 			return Plan.compareLong(tsk1.latestStartTime, tsk2.latestStartTime);
 		}
 	}
 	
-	public Comparator<Task> LatestStartTimeAscendingComparator = new LatestStartTimeAscendingComparator();
+	public static Comparator<Task> LatestStartTimeAscendingComparator = new LatestStartTimeAscendingComparator();
 
 	// ----------
 	
-	public class LatestFinishTimeAscendingComparator implements Comparator<Task> {
+	public static class LatestFinishTimeAscendingComparator implements Comparator<Task> {
 		public int compare(Task tsk1, Task tsk2) {
 			return Plan.compareLong(tsk1.latestFinishTime, tsk2.latestFinishTime);
 		}
 	}
 	
-	public Comparator<Task> LatestFinishTimeAscendingComparator = new LatestFinishTimeAscendingComparator();
+	public static Comparator<Task> LatestFinishTimeAscendingComparator = new LatestFinishTimeAscendingComparator();
 
 	// --------------------------------------------------------------------------------
 	// Pinning
@@ -361,7 +361,7 @@ public class Plan {
 	void setupResourcePools () {
 		resourcePoolLookup.clear();
 		for (ResourcePool pool: resourcePools) {
-			resourcePoolLookup.put(pool.getName(), pool);
+			resourcePoolLookup.put(pool.resourceName, pool);
 		}
 	}
 	
@@ -440,18 +440,18 @@ public class Plan {
 		ResourcePool candidate;
 		for (Task tsk: allTasks) {
 			for (ResourceClaim resourceClaim: tsk.resourceClaims){
-				candidate = resourcePoolLookup.get(resourceClaim.getName());
+				candidate = resourcePoolLookup.get(resourceClaim.resourceName);
 					if (candidate != null) {
 						resourceClaim.fullfillingPool = candidate;
 					}
 					else {
-						throw new IllegalStateException("Cannot find resource " + resourceClaim.getName());
+						System.out.println("Cannot find resource " + resourceClaim.resourceName);
+//						throw new IllegalStateException("Cannot find resource " + resourceClaim.resourceName);
 					}
 				}
 			}
 
 	}
-
 
 	// --------------------------------------------------------------------------------
 

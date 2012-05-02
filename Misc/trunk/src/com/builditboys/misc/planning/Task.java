@@ -1,8 +1,9 @@
 package com.builditboys.misc.planning;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.LinkedList;
+import java.util.List;
 import java.util.Set;
 import com.builditboys.misc.planning.Plan;
 import com.builditboys.misc.planning.Plan.CalculationResultEnum;
@@ -60,7 +61,9 @@ public class Task {
 	Set<String> predecessorNames = new HashSet<String>();
 	Set<String> successorNames = new HashSet<String>();
 
-	Collection<ResourceClaim> resourceClaims = new LinkedList<ResourceClaim>();
+	List<ResourceClaim> resourceClaims = new ArrayList<ResourceClaim>();
+
+	List<MaterialClaim> materialClaims = new ArrayList<MaterialClaim>();
 
 	long shortestDuration = -1;
 	long nominalDuration = -1;
@@ -76,8 +79,8 @@ public class Task {
 	
 	Plan containingPlan;
 
-	Set<Task> predecessors = new HashSet<Task>();
-	Set<Task> successors = new HashSet<Task>();
+	Collection<Task> predecessors = new ArrayList<Task>();
+	Collection<Task> successors = new ArrayList<Task>();
 
 	boolean isPinned = false;
 	long pinTime;
@@ -169,11 +172,11 @@ public class Task {
 
 	// ----------
 
-	public Collection<ResourceClaim> getResourceClaims() {
+	public List<ResourceClaim> getResourceClaims() {
 		return resourceClaims;
 	}
 
-	public void setResourceClaims(Set<ResourceClaim> resourceClaims) {
+	public void setResourceClaims(List<ResourceClaim> resourceClaims) {
 		this.resourceClaims= resourceClaims;
 		handleChange(TaskActionEnum.RESOURCE_CLAIMS);
 	}
@@ -185,6 +188,27 @@ public class Task {
 	
 	public void removeResourceClaim(ResourceClaim resourceClaim) {
 		resourceClaims.remove(resourceClaim);
+		handleChange(TaskActionEnum.RESOURCE_CLAIMS);
+	}
+
+	// ----------
+
+	public List<MaterialClaim> getMaterialClaims() {
+		return materialClaims;
+	}
+
+	public void setMaterialClaims(List<MaterialClaim> materialClaims) {
+		this.materialClaims= materialClaims;
+		handleChange(TaskActionEnum.RESOURCE_CLAIMS);
+	}
+	
+	public void addMaterialClaim(MaterialClaim materialClaim) {
+		materialClaims.add(materialClaim);
+		handleChange(TaskActionEnum.RESOURCE_CLAIMS);
+	}
+	
+	public void removeMaterialClaim(MaterialClaim materialClaim) {
+		materialClaims.remove(materialClaim);
 		handleChange(TaskActionEnum.RESOURCE_CLAIMS);
 	}
 
@@ -220,7 +244,7 @@ public class Task {
 		handleChange(TaskActionEnum.PREDECESSOR_NAMES);
 	}
 	
-	public Set<Task> getPredecessors () {
+	public Collection<Task> getPredecessors () {
 		return predecessors;
 	}
 
@@ -245,7 +269,7 @@ public class Task {
 		handleChange(TaskActionEnum.SUCCESSOR_NAMES);
 	}
 	
-	public Set<Task> getSuccessors () {
+	public Collection<Task> getSuccessors () {
 		return successors;
 	}
 
@@ -290,6 +314,7 @@ public class Task {
 
 	public void setHasAfterFinishConstrint(boolean hasAfterFinishConstrint) {
 		this.hasAfterFinishConstrint = hasAfterFinishConstrint;
+		handleChange(TaskActionEnum.AFTER_FINISH_MAX_WAIT);
 	}
 
 	public long getAfterFinishMaxWait() {
