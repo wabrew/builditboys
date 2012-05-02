@@ -10,7 +10,7 @@ public class VolumeUnits  extends AbstractUnit {
 
 	// --------------------------------------------------------------------------------
 	
-	public VolumeUnits (String name, String plural, String abbreviation,
+	private VolumeUnits (String name, String plural, String abbreviation,
 						double conversionFactor, AbstractUnit baseUnit) {
 		super(name, plural, abbreviation, UnitKindEnum.VOLUME,
 			  conversionFactor, baseUnit);

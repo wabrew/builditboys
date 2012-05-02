@@ -1,22 +1,24 @@
 package com.builditboys.misc.units;
 
-import java.util.EnumMap;
+import java.util.HashMap;
 import java.util.Map;
 import static com.builditboys.misc.units.TimeUnits.*;
 import static com.builditboys.misc.units.LengthUnits.*;
 import static com.builditboys.misc.units.VolumeUnits.*;
 import static com.builditboys.misc.units.AngleUnits.*;
-import static com.builditboys.misc.units.WeightUnits.*;
+import static com.builditboys.misc.units.MassUnits.*;
 
 public abstract class AbstractUnit {
 
-	public static enum UnitKindEnum { 
+	//--------------------------------------------------------------------------------
+	// Statics
+	
+	protected static enum UnitKindEnum { 
 		TIME(SECOND),
 		LENGTH(METER),
 		AREA(null),
 		VOLUME(LITER),
-		MASS(null),
-		WEIGHT(KILOGRAM),
+		MASS(KILOGRAM),
 		ANGLE(RADIAN),
 		VELOCITY(null),
 		ANGULAR_VELOCITY(null),
@@ -30,13 +32,11 @@ public abstract class AbstractUnit {
 		}	
 	};
 		
-	public static Map<UnitKindEnum, AbstractUnit> unitKindToBaseUnitMap = new EnumMap<UnitKindEnum, AbstractUnit>(UnitKindEnum.class);
+	private static Map<String, AbstractUnit> unitNameMap = 
+				new HashMap<String, AbstractUnit>();
 
-	static {
-		unitKindToBaseUnitMap.put(UnitKindEnum.TIME, SECOND);
-	}
-	
 	//--------------------------------------------------------------------------------
+	// Instance variables
 	
 	// The name of the unit
 	public final String name;
@@ -48,32 +48,47 @@ public abstract class AbstractUnit {
 	public final String abbreviation;
 	
 	// The kind of unit, weight, length, etc.
-	public final UnitKindEnum kind;
+	private final UnitKindEnum kind;
 
 	// Conversion factor to convert a unit to the common unit
-	public final double conversionFactor;
+	private final double conversionFactor;
 	
 	// The conversion factor converts to this
-	public final AbstractUnit baseUnit;
+	private final AbstractUnit baseUnit;
 	
 	
 	// The conversion factor from the unit to its base unit; computed on demand
 	private double baseConversionFactor;
 	
 	//--------------------------------------------------------------------------------
-
-	public AbstractUnit (String name, String plural, String abbreviation,
-				         UnitKindEnum kind, double conversionFactor, AbstractUnit baseUnit) {
+	// Constructor
+	
+	protected AbstractUnit (String name, String plural, String abbreviation,
+				            UnitKindEnum kind, double conversionFactor, AbstractUnit baseUnit) {
 		this.name = name;
 		this.plural = plural;
 		this.abbreviation = abbreviation;
 		this.kind = kind;
 		this.conversionFactor = conversionFactor;	
 		this.baseUnit = baseUnit;
+		
+		unitNameMap.put(name, this);
 	}
 	
 	//--------------------------------------------------------------------------------
-
+	// Lookup
+	
+	public static AbstractUnit getUnitNamed(String name) {
+		AbstractUnit unit = unitNameMap.get(name);
+		if (unit == null) {
+			throw new IllegalArgumentException("No unit named " + name);
+		}
+		return unitNameMap.get(name);
+	}
+	
+	//--------------------------------------------------------------------------------
+	// Converters
+	
 	public static double convert (double val, AbstractUnit fromUnit, AbstractUnit toUnit) {
 		if (fromUnit.kind != toUnit.kind) {
 			throw new IllegalArgumentException("Units are different kinds: "
@@ -180,6 +195,34 @@ public abstract class AbstractUnit {
 			quot = quot / toConversionFactor;
 		}
 		return (int) quot;
+	}
+	
+	//--------------------------------------------------------------------------------
+	// Convert to/from
+	
+	public double convertTo (double val, AbstractUnit toUnit) {
+		return convert(val, this, toUnit);
+	}
+	
+	public double convertFrom (double val, AbstractUnit fromUnit) {
+		return convert(val, fromUnit, this);
+	}
+	
+	public long convertTo (long val, AbstractUnit toUnit) {
+		return convert(val, this, toUnit);
+	}
+	
+	public long convertFrom (long val, AbstractUnit fromUnit) {
+		return convert(val, fromUnit, this);
+	}
+
+	
+	public int convertTo (int val, AbstractUnit toUnit) {
+		return convert(val, this, toUnit);
+	}
+	
+	public int convertFrom (int val, AbstractUnit fromUnit) {
+		return convert(val, fromUnit, this);
 	}
 
 }
