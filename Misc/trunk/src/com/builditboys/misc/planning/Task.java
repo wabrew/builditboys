@@ -730,12 +730,14 @@ public class Task {
 						   + showableTime(earliestStartTime) + " " 
 				           + showableTime(nominalStartTime) + " " 
 						   + showableTime(latestStartTime) + " / "
-					       + showableTime(actualStartTime));
+					       + showableTime(actualStartTime) + "   "
+					       + getNominalStartTimeString(TimeAdjustmentEnum.RELATIVE));
 		System.out.println(prefixn + " " + "Finish: " 
 					       + showableTime(earliestFinishTime) + " " 
 					       + showableTime(nominalFinishTime) + " " 
 					       + showableTime(latestFinishTime) + " / "
-					       + showableTime(actualFinishTime));
+					       + showableTime(actualFinishTime) + "   "
+					       + getNominalFinishTimeString(TimeAdjustmentEnum.RELATIVE));
 	}
 
 }
