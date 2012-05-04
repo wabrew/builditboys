@@ -68,7 +68,7 @@ public class Plan {
 	long relativeTimeAdjustment;
 	long absoluteTimeAdjustment;
 	
-	TimeStringMakerInterface timeStringGenerator;
+	TimeStringMakerInterface timeStringMaker;
 
 	// ----------
 	// Computed plan properties
@@ -328,8 +328,8 @@ public class Plan {
 		this.relativeTimeAdjustment = relativeTimeAdjustment;
 	}
 
-	public void setRelativeTimeAdjustment(long relativeTimeAdjustment, TimeUnits units) {
-		this.relativeTimeAdjustment = TimeUnits.convert(relativeTimeAdjustment, units,  TimeUnits.MILLISECOND);
+	public void setRelativeTimeAdjustment(double relativeTimeAdjustment, TimeUnits units) {
+		this.relativeTimeAdjustment = (long) TimeUnits.convert(relativeTimeAdjustment, units,  TimeUnits.MILLISECOND);
 	}
 
 	
@@ -341,6 +341,16 @@ public class Plan {
 		this.absoluteTimeAdjustment = absoluteTimeAdjustment;
 	}
 	
+	// --------------------------------------------------------------------------------
+	
+	public TimeStringMakerInterface getTimeStringMaker() {
+		return timeStringMaker;
+	}
+
+	public void setTimeStringMaker(TimeStringMakerInterface timeStringGenerator) {
+		this.timeStringMaker = timeStringGenerator;
+	}
+
 	// --------------------------------------------------------------------------------
 	public void setup() {
 		setupTasks();
@@ -887,13 +897,16 @@ public class Plan {
 	
 	String formatTaskTimeString(long time, TimeAdjustmentEnum adjustment) {
 		// in general, the adjustment value will be 0 unless there is a pinned task
+		if (timeStringMaker == null) {
+			return "no time string maker";
+		}
 		switch (adjustment) {
 		case DURATION:
-			return timeStringGenerator.makeDurationTimeString(time);
+			return timeStringMaker.makeDurationTimeString(time);
 		case RELATIVE:
-			return timeStringGenerator.makeRelativeTimeString(time, relativeTimeAdjustment);
+			return timeStringMaker.makeRelativeTimeString(time, relativeTimeAdjustment);
 		case ABSOLUTE:
-			return timeStringGenerator.makeAbsoluteTimeString(time, absoluteTimeAdjustment);
+			return timeStringMaker.makeAbsoluteTimeString(time, absoluteTimeAdjustment);
 		default:
 			throw new IllegalArgumentException("Unknown TimeAdjustmentEnum " + adjustment);
 		}
@@ -942,7 +955,7 @@ public class Plan {
 	// Printing
 	
 	public void show() {
-		System.out.println("Plan: " + name);
+		System.out.println("Plan name: " + name);
 		System.out.println("Description: " + description);
 		int i = 1;
 		for (Task act : allTasks) {
