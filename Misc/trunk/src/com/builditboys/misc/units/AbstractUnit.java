@@ -58,7 +58,8 @@ public abstract class AbstractUnit {
 	
 	
 	// The conversion factor from the unit to its base unit; computed on demand
-	private double baseConversionFactor;
+	private double derivedBaseConversionFactor;
+	private AbstractUnit derivedBaseUnit;
 	
 	//--------------------------------------------------------------------------------
 	// Constructor
@@ -87,26 +88,70 @@ public abstract class AbstractUnit {
 	}
 	
 	//--------------------------------------------------------------------------------
-	// Converters
+	// Finding the correct conversion
 	
-	public static double convert (double val, AbstractUnit fromUnit, AbstractUnit toUnit) {
-		if (fromUnit.kind != toUnit.kind) {
-			throw new IllegalArgumentException("Units are different kinds: "
-											   + fromUnit + " " + toUnit);
+	// Conversions should form a tree for each kind of unit.
+	// Setting up the base conversions takes place on demand.  It
+	// sets up short cut links from a unit to the base of its tree.
+	
+	private void setupBaseConversion () {
+		// Already setup, nothing to do
+		if (derivedBaseUnit != null) {
+			return;
 		}
 		
+		// At the base of the tree, trivial setup, you are the derived base
+		if (baseUnit == null) {
+			derivedBaseConversionFactor = 1.0;
+			derivedBaseUnit = this;
+			return;
+		}
+		
+		// Recursively setup your base unit and then setup yourself
+		baseUnit.setupBaseConversion();
+		derivedBaseConversionFactor = conversionFactor * baseUnit.derivedBaseConversionFactor;
+		derivedBaseUnit = baseUnit.derivedBaseUnit;
+	}
+	
+
+	//--------------------------------------------------------------------------------
+	// Make sure the units look ok
+	
+	private static void prepareConversion (AbstractUnit fromUnit, AbstractUnit toUnit) {
+		// make sure you are converting compatible units, e.g., length to length
+		if (fromUnit.kind != toUnit.kind) {
+			throw new IllegalArgumentException("Units are different kinds:"
+											   + " " + fromUnit + " is a " + fromUnit.kind
+											   + " " + toUnit + " is a " + toUnit.kind);
+		}
+		
+		fromUnit.setupBaseConversion();
+		toUnit.setupBaseConversion();
+		
+		// make sure the conversion tree is well connected, both units need
+		// to bottom out on the same fundamental base unit
+		if (fromUnit.derivedBaseUnit != toUnit.derivedBaseUnit) {
+			throw new IllegalStateException("Base unit mismatch:"
+											+ " " + fromUnit + " -> " + fromUnit.derivedBaseUnit
+											+ " " + toUnit + " -> " + toUnit.derivedBaseUnit);
+		}
+	}
+	
+	//--------------------------------------------------------------------------------
+	// Converters
+	
+	public static double convert (double val, AbstractUnit fromUnit, AbstractUnit toUnit) {	
 		// same unit, no conversion necessary
 		if (fromUnit == toUnit) {
 			return val;
 		}
 		
-		if (fromUnit.baseUnit != toUnit.baseUnit) {
-			throw new IllegalStateException("Base unit mismatch");
-		}
-		
+		prepareConversion(fromUnit, toUnit);
+
+		double fromConversionFactor = fromUnit.derivedBaseConversionFactor;
+		double toConversionFactor = toUnit.derivedBaseConversionFactor;
+
 		// same conversion factor, no conversion necessary
-		double fromConversionFactor = fromUnit.conversionFactor;
-		double toConversionFactor = toUnit.conversionFactor;
 		if (fromConversionFactor == toConversionFactor) {
 			return val;
 		}
@@ -126,27 +171,21 @@ public abstract class AbstractUnit {
 	}
 	
 	public static long convert (long val, AbstractUnit fromUnit, AbstractUnit toUnit) {
-		if (fromUnit.kind != toUnit.kind) {
-			throw new IllegalArgumentException("Units are different kinds: "
-											   + fromUnit + " " + toUnit);
-		}
-
 		// same unit, no conversion necessary
 		if (fromUnit == toUnit) {
 			return val;
 		}
 		
-		if (fromUnit.baseUnit != toUnit.baseUnit) {
-			throw new IllegalStateException("Base unit mismatch");
-		}
-		
+		prepareConversion(fromUnit, toUnit);
+
+		double fromConversionFactor = fromUnit.derivedBaseConversionFactor;
+		double toConversionFactor = toUnit.derivedBaseConversionFactor;
+
 		// same conversion factor, no conversion necessary
-		double fromConversionFactor = fromUnit.conversionFactor;
-		double toConversionFactor = toUnit.conversionFactor;
 		if (fromConversionFactor == toConversionFactor) {
 			return val;
 		}
-		
+
 		// do the conversion
 		double prod;
 		double quot;
@@ -158,27 +197,21 @@ public abstract class AbstractUnit {
 		if (toConversionFactor != 1.0) {
 			quot = quot / toConversionFactor;
 		}
-		return (long) quot;
+		return Math.round(quot);
 	}
 
 	public static int convert (int val, AbstractUnit fromUnit, AbstractUnit toUnit) {
-		if (fromUnit.kind != toUnit.kind) {
-			throw new IllegalArgumentException("Units are different kinds: "
-											   + fromUnit + " " + toUnit);
-		}
-
 		// same unit, no conversion necessary
 		if (fromUnit == toUnit) {
 			return val;
 		}
 		
-		if (fromUnit.baseUnit != toUnit.baseUnit) {
-			throw new IllegalStateException("Base unit mismatch");
-		}
-		
+		prepareConversion(fromUnit, toUnit);
+
+		double fromConversionFactor = fromUnit.derivedBaseConversionFactor;
+		double toConversionFactor = toUnit.derivedBaseConversionFactor;
+
 		// same conversion factor, no conversion necessary
-		double fromConversionFactor = fromUnit.conversionFactor;
-		double toConversionFactor = toUnit.conversionFactor;
 		if (fromConversionFactor == toConversionFactor) {
 			return val;
 		}
@@ -194,7 +227,7 @@ public abstract class AbstractUnit {
 		if (toConversionFactor != 1.0) {
 			quot = quot / toConversionFactor;
 		}
-		return (int) quot;
+		return (int) Math.round(quot);
 	}
 	
 	//--------------------------------------------------------------------------------

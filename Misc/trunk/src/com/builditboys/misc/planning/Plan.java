@@ -16,6 +16,8 @@ import com.builditboys.misc.planning.Task.DurationKindEnum;
 import com.builditboys.misc.planning.Task.TaskActionEnum;
 import com.builditboys.misc.planning.Task.TaskKindEnum;
 import com.builditboys.misc.planning.Task.TaskTimeEnum;
+import com.builditboys.misc.planning.Task.TimeAdjustmentEnum;
+import com.builditboys.misc.units.TimeUnits;
 
 public class Plan {
 
@@ -61,6 +63,13 @@ public class Plan {
 
 	CalculationModeEnum calculationMode = CalculationModeEnum.CRITICAL_PATH;	
 	
+	// the time that will used to offset the zero point of the relative plan
+	// times
+	long relativeTimeAdjustment;
+	long absoluteTimeAdjustment;
+	
+	TimeStringMakerInterface timeStringGenerator;
+
 	// ----------
 	// Computed plan properties
 	
@@ -89,7 +98,6 @@ public class Plan {
 
 	long resultAlignmentOffsets[] = new long[CalculationResultEnum.values().length];
 	
-	long absoluteTimeReference;
 
 	
 	// --------------------------------------------------------------------------------
@@ -312,6 +320,28 @@ public class Plan {
 
 	// --------------------------------------------------------------------------------
 
+	public long getRelativeTimeAdjustment() {
+		return relativeTimeAdjustment;
+	}
+
+	public void setRelativeTimeAdjustment(long relativeTimeAdjustment) {
+		this.relativeTimeAdjustment = relativeTimeAdjustment;
+	}
+
+	public void setRelativeTimeAdjustment(long relativeTimeAdjustment, TimeUnits units) {
+		this.relativeTimeAdjustment = TimeUnits.convert(relativeTimeAdjustment, units,  TimeUnits.MILLISECOND);
+	}
+
+	
+	public long getAbsoluteTimeAdjustment() {
+		return absoluteTimeAdjustment;
+	}
+
+	public void setAbsoluteTimeAdjustment(long absoluteTimeAdjustment) {
+		this.absoluteTimeAdjustment = absoluteTimeAdjustment;
+	}
+	
+	// --------------------------------------------------------------------------------
 	public void setup() {
 		setupTasks();
 		setupResourcePools();
@@ -499,19 +529,19 @@ public class Plan {
 	}
 	
 	// --------------------------------------------------------------------------------
-
+/*
 	public long getShortestDuration () {
-		return finishTask.getEarliestFinish() - startTask.getLatestStart();
+		return finishTask.getEarliestFinishTime(true) - startTask.getLatestStartTime(true);
 	}
 
 	public long getNominalDuration () {
-		return finishTask.getNominalFinish() - startTask.getNominalStart();
+		return finishTask.getNominalFinishTime(true) - startTask.getNominalStartTime(true);
 	}
 	
 	public long getLongestDuration () {
-		return finishTask.getLatestFinish() - startTask.getEarliestStart();
+		return finishTask.getLatestFinishTime(true) - startTask.getEarliestStartTime(true);
 	}
-	
+*/	
 	// --------------------------------------------------------------------------------
 
 	void calculateBaseSchedules () {
@@ -661,21 +691,19 @@ public class Plan {
 	
 	void calculateAlignment() {
 		Task referenceTimeTask;
-		TaskTimeEnum refTime;
+		TaskTimeEnum refTimeKind;
 		
 		if (pinnedTask != null) {
 			referenceTimeTask = pinnedTask;
+			refTimeKind = pinnedTask.pinTimeKind;
 		}
 		else {
 			referenceTimeTask = startTask;
-		}
-		refTime = referenceTimeTask.pinTimeKind;
-		if (refTime == null) {
-			refTime = TaskTimeEnum.START;
+			refTimeKind = TaskTimeEnum.START;
 		}
 		
 		for (CalculationResultEnum resultKind: calculatedResultKinds) {
-			switch (refTime) {
+			switch (refTimeKind) {
 			case START:
 				resultAlignmentOffsets[resultKind.ordinal()] 
 						= referenceTimeTask.calculatedStartTimes[CalculationResultEnum.NOMINAL.ordinal()];
@@ -685,7 +713,7 @@ public class Plan {
 						= referenceTimeTask.calculatedFinishTimes[CalculationResultEnum.NOMINAL.ordinal()];
 				break;
 			default:
-				throw new IllegalStateException("Unknown pin time " + refTime);
+				throw new IllegalStateException("Unknown pin time " + refTimeKind);
 			}
 		}
 		
@@ -797,7 +825,6 @@ public class Plan {
 			
 		case PIN:
 			pinnedTask = changedOne;
-			absoluteTimeReference = pinnedTask.pinTime;
 			for (Task tsk: allTasks) {
 				if (tsk != changedOne) {
 					tsk.retractPin();
@@ -807,7 +834,6 @@ public class Plan {
 			
 		case UNPIN:
 			pinnedTask = null;
-			absoluteTimeReference = 0;
 			break;
 			
 		case START:
@@ -843,10 +869,34 @@ public class Plan {
 	}
 
 	// --------------------------------------------------------------------------------
-	// Called by tasks when they want their absolute time
+	// Called by tasks when they want their absolute time or date
 	
-	long adjustedTaskTime(long time) {
-		return time + absoluteTimeReference;
+	long adjustedTaskTime(long time, TimeAdjustmentEnum adjustment) {
+		// in general, the adjustment value will be 0 unless there is a pinned task
+		switch (adjustment) {
+		case DURATION:
+			return time;
+		case RELATIVE:
+			return time + relativeTimeAdjustment;
+		case ABSOLUTE:
+			return time + absoluteTimeAdjustment;
+		default:
+			throw new IllegalArgumentException("Unknown TimeAdjustmentEnum " + adjustment);
+		}
+	}
+	
+	String formatTaskTimeString(long time, TimeAdjustmentEnum adjustment) {
+		// in general, the adjustment value will be 0 unless there is a pinned task
+		switch (adjustment) {
+		case DURATION:
+			return timeStringGenerator.makeDurationTimeString(time);
+		case RELATIVE:
+			return timeStringGenerator.makeRelativeTimeString(time, relativeTimeAdjustment);
+		case ABSOLUTE:
+			return timeStringGenerator.makeAbsoluteTimeString(time, absoluteTimeAdjustment);
+		default:
+			throw new IllegalArgumentException("Unknown TimeAdjustmentEnum " + adjustment);
+		}
 	}
 
 	// --------------------------------------------------------------------------------

@@ -1,7 +1,6 @@
 package com.builditboys.misc.planning;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 import org.simpleframework.xml.Element;
