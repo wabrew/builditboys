@@ -22,6 +22,12 @@ public class Task {
 		START, FINISH
 	};
 	
+	public enum TimeAdjustmentEnum { 
+		DURATION, RELATIVE, ABSOLUTE
+	};
+	
+
+	
 
 	static enum DurationKindEnum {
 		SHORTEST, NOMINAL, LONGEST
@@ -83,7 +89,6 @@ public class Task {
 	Collection<Task> successors = new ArrayList<Task>();
 
 	boolean isPinned = false;
-	long pinTime;
 	TaskTimeEnum pinTimeKind;
 	
 	long earliestStartTime;
@@ -333,10 +338,6 @@ public class Task {
 		return isPinned;
 	}
 
-	public long getPinTime() {
-		return pinTime;
-	}
-	
 	public TaskTimeEnum getPinTimeKind() {
 		return pinTimeKind;
 	}
@@ -350,34 +351,21 @@ public class Task {
 	
 	void retractPin() {
 		isPinned = false;
-		pinTime = 0;
 		pinTimeKind = null;
 	}
 
-	public void pinEstimatedStart(long when) {
+	public void pinNominalStart() {
 		isPinned = true;
-		pinTime = when;
 		pinTimeKind = TaskTimeEnum.START;
 		handleChange(TaskActionEnum.PIN);
 	}
 
-	public void pinEstimatedStartNow() {
-		long now = System.currentTimeMillis();
-		pinEstimatedStart(now);
-	}
-
-	public void pinEstimatedFinish(long when) {
+	public void pinNominalFinish() {
 		isPinned = true;
-		pinTime = when;
 		pinTimeKind = TaskTimeEnum.FINISH;
 		handleChange(TaskActionEnum.PIN);
 	}
 
-	public void pinEstimatedFinishNow() {
-		long now = System.currentTimeMillis();
-		pinEstimatedFinish(now);
-	}
-	
 	// --------------------------------------------------------------------------------
 	// Starting and Finishing a task
 	
@@ -416,38 +404,65 @@ public class Task {
 	// --------------------------------------------------------------------------------
 	// Getting the various start and finish times
 	
-	public long getNominalStart() {
-		return containingPlan.adjustedTaskTime(earliestStartTime);
+	public long getNominalStartTime(TimeAdjustmentEnum adjustment) {
+		return adjustedTime(nominalStartTime, adjustment);
+	}
+		
+	public long getNominalFinishTime(TimeAdjustmentEnum adjustment) {
+		return adjustedTime(nominalFinishTime, adjustment);
 	}
 
-	public long getNominalFinish() {
-		return containingPlan.adjustedTaskTime(latestStartTime);
+	public long getEarliestStartTime(TimeAdjustmentEnum adjustment) {
+		return adjustedTime(earliestStartTime, adjustment);
 	}
 
-	public long getEarliestStart() {
-		return containingPlan.adjustedTaskTime(earliestStartTime);
+	public long getEarliestFinishTime(TimeAdjustmentEnum adjustment) {
+		return adjustedTime(earliestFinishTime, adjustment);
 	}
 
-	public long getLatestStart() {
-		return containingPlan.adjustedTaskTime(latestStartTime);
+	public long getLatestStartTime(TimeAdjustmentEnum adjustment) {
+		return adjustedTime(latestStartTime, adjustment);
 	}
 
-	public long getEarliestFinish() {
-		return containingPlan.adjustedTaskTime(earliestFinishTime);
+	public long getLatestFinishTime(TimeAdjustmentEnum adjustment) {
+		return adjustedTime(latestFinishTime, adjustment);
+	}
+	
+	long adjustedTime (long time, TimeAdjustmentEnum adjustment) {
+		return containingPlan.adjustedTaskTime(time, adjustment);
 	}
 
-	public long getLatestFinish() {
-		return containingPlan.adjustedTaskTime(latestFinishTime);
+	// --------------------------------------------------------------------------------
+	// Time strings
+		
+	public String getNominalStartTimeString(TimeAdjustmentEnum adjustment) {
+		return formatTimeString(nominalStartTime, adjustment);
 	}
 
-	public long getActualStart() {
-		return containingPlan.adjustedTaskTime(actualStartTime);
+	public String getNominalFinishTimeString(TimeAdjustmentEnum adjustment) {
+		return formatTimeString(nominalFinishTime, adjustment);
+	}
+	
+	public String getEarliestStartTimeString(TimeAdjustmentEnum adjustment) {
+		return formatTimeString(earliestStartTime, adjustment);
 	}
 
-	public long getActualFinish() {
-		return containingPlan.adjustedTaskTime(actualFinishTime);
+	public String getEarliestFinishTimeString(TimeAdjustmentEnum adjustment) {
+		return formatTimeString(earliestFinishTime, adjustment);
 	}
 
+	public String getLatestStartTimeString(TimeAdjustmentEnum adjustment) {
+		return formatTimeString(latestStartTime, adjustment);
+	}
+
+	public String getLatestFinishTimeString(TimeAdjustmentEnum adjustment) {
+		return formatTimeString(latestFinishTime, adjustment);
+	}
+
+	String formatTimeString (long time, TimeAdjustmentEnum adjustment) {
+		return containingPlan.formatTaskTimeString(time, adjustment);
+	}
+	
 	// --------------------------------------------------------------------------------
 	// A few duration utilities
 	
@@ -518,7 +533,6 @@ public class Task {
 	
 	void reset() {
 		isPinned = false;
-		pinTime = 0;
 		pinTimeKind = null;
 
 		earliestStartTime = 0;
@@ -712,7 +726,6 @@ public class Task {
 		System.out.println(prefixn + " " + "Variance reason: " + varianceReason);
 		System.out.println(prefixn + " " + "Predecessors: " + predecessorNames);
 		System.out.println(prefixn + " " + "Successors: " + successorNames);
-		System.out.println(prefixn + " " + "Pin time: " + pinTime);
 		System.out.println(prefixn + " " + "Start:  " 
 						   + showableTime(earliestStartTime) + " " 
 				           + showableTime(nominalStartTime) + " " 
