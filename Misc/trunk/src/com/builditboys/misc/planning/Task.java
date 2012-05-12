@@ -44,7 +44,7 @@ public class Task {
 		KIND,
 		RESOURCE_CLAIMS,
 		VARIANCE_REASON, 
-		PREDECESSOR_NAMES, SUCCESSOR_NAMES, 
+		PREDECESSOR_IDENTIFIERS, SUCCESSOR_IDENTIFIERS, 
 		SHORTEST_DURATION, NOMINAL_DURATION, LONGEST_DURATION,
 		AFTER_FINISH_MAX_WAIT,
 		
@@ -57,15 +57,17 @@ public class Task {
 	// ----------
 	// User specified (mostly non changing) properties of tasks
 
-	final String name;
+	final String identifier;
+	
+	String name;
 	String description;
 
 	TaskKindEnum kind = TaskKindEnum.ACTIVE;
 
 	TaskVarianceEnum varianceReason = TaskVarianceEnum.UNCERTAIN;
 
-	Set<String> predecessorNames = new HashSet<String>();
-	Set<String> successorNames = new HashSet<String>();
+	Set<String> predecessorIdentifiers = new HashSet<String>();
+	Set<String> successorIdentifiers = new HashSet<String>();
 
 	List<ResourceClaim> resourceClaims = new ArrayList<ResourceClaim>();
 
@@ -119,41 +121,66 @@ public class Task {
 	// --------------------------------------------------------------------------------
 	// Constructors
 	
-	public Task(String nm) {
-		name = nm;
+	public Task(String id) {
+		super();
+		identifier = id;
 	}
 
-	public Task(TaskKindEnum knd, String nm, String desc,
+	public Task(String id, String name, String desc,
 				long sDuration, long nDuration, long lDuration) {
-		if (nm == null) {
-			throw new IllegalArgumentException("Cannot have null task name");
+		super();
+		if (id == null) {
+			throw new IllegalArgumentException("Cannot have null task identifier");
 		}
-		kind = knd;
-		name = nm;
-		description = desc;
-		shortestDuration = sDuration;
-		nominalDuration = nDuration;
-		longestDuration = lDuration;
+		this.identifier = id;
+		this.name = name;
+		this.description = desc;
+		this.shortestDuration = sDuration;
+		this.nominalDuration = nDuration;
+		this.longestDuration = lDuration;
 	}
 
-	public Task(TaskKindEnum knd, String nm, String desc, long nDuration) {
-		kind = knd;
-		name = nm;
-		description = desc;
-		shortestDuration = nDuration;
-		nominalDuration = nDuration;
-		longestDuration = nDuration;
+	public Task(String id, String name, String desc, long nDuration) {
+		super();
+		this.identifier = id;
+		this.name = name;
+		this.description = desc;
+		this.shortestDuration = nDuration;
+		this.nominalDuration = nDuration;
+		this.longestDuration = nDuration;
 	}
+	
+	public Task(TaskKindEnum kind, String id, String name, String desc, long nDuration) {
+		super();
+		this.identifier = id;
+		this.kind = kind;
+		this.name = name;
+		this.description = desc;
+		this.shortestDuration = nDuration;
+		this.nominalDuration = nDuration;
+		this.longestDuration = nDuration;
+	}
+
 
 	// --------------------------------------------------------------------------------
 	// Some basic public accessors
 	
 	// ----------
 	
+	public String getIdentifier() {
+		return identifier;
+	}
+	
+	// ----------
+
 	public String getName() {
 		return name;
 	}
-	
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
 	// ----------
 	
 	public String getDescription() {
@@ -230,23 +257,23 @@ public class Task {
 
 	// ----------
 
-	public Set<String> getPredecessorNames() {
-		return predecessorNames;
+	public Set<String> getPredecessorIdentifiers() {
+		return predecessorIdentifiers;
 	}
 
-	public void setPredecessorNames(Set<String> predecessorNames) {
-		this.predecessorNames = predecessorNames;
-		handleChange(TaskActionEnum.PREDECESSOR_NAMES);
+	public void setPredecessorIdentifiers(Set<String> predecessorIdentifiers) {
+		this.predecessorIdentifiers = predecessorIdentifiers;
+		handleChange(TaskActionEnum.PREDECESSOR_IDENTIFIERS);
 	}
 	
-	public void addPredecessorName(String predName) {
-		predecessorNames.add(predName);
-		handleChange(TaskActionEnum.PREDECESSOR_NAMES);
+	public void addPredecessorIdentifier(String predIdentifier) {
+		predecessorIdentifiers.add(predIdentifier);
+		handleChange(TaskActionEnum.PREDECESSOR_IDENTIFIERS);
 	}
 	
-	public void removePredecessorName(String predName) {
-		predecessorNames.remove(predName);
-		handleChange(TaskActionEnum.PREDECESSOR_NAMES);
+	public void removePredecessorIdentifier(String predIdentifier) {
+		predecessorIdentifiers.remove(predIdentifier);
+		handleChange(TaskActionEnum.PREDECESSOR_IDENTIFIERS);
 	}
 	
 	public Collection<Task> getPredecessors () {
@@ -255,23 +282,23 @@ public class Task {
 
 	// ----------
 
-	public Set<String> getSuccessorNames() {
-		return successorNames;
+	public Set<String> getSuccessorIdentifiers() {
+		return successorIdentifiers;
 	}
 
-	public void setSuccessorNames(Set<String> successorNames) {
-		this.successorNames = successorNames;
-		handleChange(TaskActionEnum.SUCCESSOR_NAMES);
+	public void setSuccessorIdentifiers(Set<String> successorIdentifiers) {
+		this.successorIdentifiers = successorIdentifiers;
+		handleChange(TaskActionEnum.SUCCESSOR_IDENTIFIERS);
 	}
 	
-	public void addSuccessorName(String succName) {
-		successorNames.add(succName);
-		handleChange(TaskActionEnum.SUCCESSOR_NAMES);
+	public void addSuccessorIdentifier(String succIdentifier) {
+		successorIdentifiers.add(succIdentifier);
+		handleChange(TaskActionEnum.SUCCESSOR_IDENTIFIERS);
 	}
 	
-	public void removeSuccessorName(String succName) {
-		successorNames.remove(succName);
-		handleChange(TaskActionEnum.SUCCESSOR_NAMES);
+	public void removeSuccessorIdentifier(String succIdentifier) {
+		successorIdentifiers.remove(succIdentifier);
+		handleChange(TaskActionEnum.SUCCESSOR_IDENTIFIERS);
 	}
 	
 	public Collection<Task> getSuccessors () {
@@ -508,7 +535,7 @@ public class Task {
 	
 	void normalizeDurations () {
 		if (nominalDuration < 0) {
-			throw new IllegalStateException("Negative duration value for " + name);
+			throw new IllegalStateException("Negative duration value for " + identifier);
 		}
 		if (shortestDuration < 0) {
 			shortestDuration = nominalDuration;
@@ -682,7 +709,7 @@ public class Task {
 		long calculatedStartTime;
 		long calculatedFinishTime;
 		
-		System.out.println("Task " + name + " times:");
+		System.out.println("Task " + identifier + " times:");
 		System.out.println(" " + showableTime(earliestStartTime) + " "
 							   + showableTime(earliestFinishTime) + " "
 							   + showableTime(latestStartTime) + " "
@@ -711,11 +738,12 @@ public class Task {
 	// Printing
 	
 	public String toString() {
-		return "Task \"" + name + "\"";
+		return "Task \"" + identifier + "\"";
 	}
 
 	public void Show(String prefix1, String prefixn) {
-		System.out.println(prefix1 + " Task: " + name);
+		System.out.println(prefix1 + " Task: " + identifier);
+		System.out.println(prefixn + " " + "Name: " + name);
 		System.out.println(prefixn + " " + "Description: " + description);
 		System.out.println(prefixn + " " + "Kind: " + kind);
 		System.out.println(prefixn + " " + "Durations: " 
@@ -724,8 +752,8 @@ public class Task {
 						   + showableDuration(longestDuration));
 		System.out.println(prefixn + " " + "Pinned: " + isPinned);
 		System.out.println(prefixn + " " + "Variance reason: " + varianceReason);
-		System.out.println(prefixn + " " + "Predecessors: " + predecessorNames);
-		System.out.println(prefixn + " " + "Successors: " + successorNames);
+		System.out.println(prefixn + " " + "Predecessors: " + predecessorIdentifiers);
+		System.out.println(prefixn + " " + "Successors: " + successorIdentifiers);
 		System.out.println(prefixn + " " + "Start:  " 
 						   + showableTime(earliestStartTime) + " " 
 				           + showableTime(nominalStartTime) + " " 

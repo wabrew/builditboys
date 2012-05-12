@@ -73,8 +73,8 @@ public class Plan {
 	// ----------
 	// Computed plan properties
 	
-	Task startTask = new Task(TaskKindEnum.PASSIVE, "-Start-Task-", "Created Start Task", 0);
-	Task finishTask = new Task(TaskKindEnum.PASSIVE, "-Finish-Task-", "Created Finish Task", 0);
+	Task startTask = new Task(TaskKindEnum.PASSIVE, "-Start-Task-", "Start Task", "Created Start Task", 0);
+	Task finishTask = new Task(TaskKindEnum.PASSIVE, "-Finish-Task-", "Finish Task", "Created Finish Task", 0);
 
 	boolean isSetUp = false;
 
@@ -378,18 +378,18 @@ public class Plan {
 	void setupTasks () {
 		taskLookup.clear();
 		for (Task tsk: userTasks) {
-			taskLookup.put(tsk.name, tsk);
+			taskLookup.put(tsk.identifier, tsk);
 			tsk.setContainingPlan(this);
 			tsk.normalizeDurations();
 		}
 		allTasks.clear();
 		allTasks.addAll(userTasks);
 		
-		taskLookup.put(startTask.name, startTask);
+		taskLookup.put(startTask.identifier, startTask);
 		startTask.setContainingPlan(this);
 		allTasks.add(startTask);
 		
-		taskLookup.put(finishTask.name, finishTask);
+		taskLookup.put(finishTask.identifier, finishTask);
 		finishTask.setContainingPlan(this);	
 		allTasks.add(finishTask);
 	}
@@ -410,24 +410,24 @@ public class Plan {
 		List<Task> finishers = new ArrayList<Task>(allTasks.size());
 
 		for (Task tsk : userTasks) {
-			if (tsk.predecessorNames.isEmpty()) {
+			if (tsk.predecessorIdentifiers.isEmpty()) {
 				starters.add(tsk);
 			}
-			if (tsk.successorNames.isEmpty()) {
+			if (tsk.successorIdentifiers.isEmpty()) {
 				finishers.add(tsk);
 			}
 		}
 		System.out.println(starters + " " + finishers);
 
-		Set<String> startNames = startTask.successorNames;
+		Set<String> startNames = startTask.successorIdentifiers;
 		startNames.clear();
 		for (Task tsk : starters) {
-			startNames.add(tsk.name);
+			startNames.add(tsk.identifier);
 		}
-		Set<String> finishNames = finishTask.predecessorNames;
+		Set<String> finishNames = finishTask.predecessorIdentifiers;
 		finishNames.clear();
 		for (Task tsk : finishers) {
-			finishNames.add(tsk.name);
+			finishNames.add(tsk.identifier);
 		}
 	}
 
@@ -440,11 +440,11 @@ public class Plan {
 		}
 
 		for (Task tsk : allTasks) {
-			for (String nm : tsk.predecessorNames) {
+			for (String nm : tsk.predecessorIdentifiers) {
 				candidate = taskLookup.get(nm);
 				if (candidate == null) {
-					throw new IllegalStateException("Bad predecessor name"
-													+ tsk.name + " / " + nm);
+					throw new IllegalStateException("Bad predecessor name "
+													+ tsk.identifier + " / " + nm);
 				} else {
 					tsk.predecessors.add(candidate);
 // don't disturb user specified information
@@ -455,11 +455,11 @@ public class Plan {
 		}
 
 		for (Task tsk : allTasks) {
-			for (String nm : tsk.successorNames) {
+			for (String nm : tsk.successorIdentifiers) {
 				candidate = taskLookup.get(nm);
 				if (candidate == null) {
 					throw new IllegalStateException("Bad successor name"
-													+ tsk.name + " / " + nm);
+													+ tsk.identifier + " / " + nm);
 				} else {
 					tsk.successors.add(candidate);
 // don't disturb user specified information
@@ -813,8 +813,8 @@ public class Plan {
 		// ----------
 		// Things you can change
 		
-		case PREDECESSOR_NAMES:
-		case SUCCESSOR_NAMES:
+		case PREDECESSOR_IDENTIFIERS:
+		case SUCCESSOR_IDENTIFIERS:
 			setup();
 			break;
 			
