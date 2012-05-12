@@ -12,6 +12,9 @@ import com.builditboys.misc.planning.Task.TaskVarianceEnum;
 class SimpleXMLTask {
 	
 	@Element
+	String identifier;
+	
+	@Element(required=false)
 	String name;
 	
 	@Element(required=false)
@@ -24,10 +27,10 @@ class SimpleXMLTask {
 	TaskVarianceEnum varianceReason;
 
 	@ElementList(required=false)
-	Set<String> predecessorNames;
+	Set<String> predecessorIdentifiers;
 	
 	@ElementList(required=false)		
-	Set<String> successorNames;
+	Set<String> successorIdentifiers;
 
 	@ElementList(required=false)
 	List<SimpleXMLResourceClaim> resourceClaims;
@@ -55,12 +58,13 @@ class SimpleXMLTask {
 	static SimpleXMLTask constructXMLTask (Task task) {
 		SimpleXMLTask xmlTask = new SimpleXMLTask();
 		
+		xmlTask.identifier = task.identifier;
 		xmlTask.name = task.name;
-		xmlTask.description = task.name;
+		xmlTask.description = task.identifier;
 		xmlTask.kind = task.kind;
 		xmlTask.varianceReason = task.varianceReason;
-		xmlTask.predecessorNames = task.predecessorNames;
-		xmlTask.successorNames = task.successorNames;
+		xmlTask.predecessorIdentifiers = task.predecessorIdentifiers;
+		xmlTask.successorIdentifiers = task.successorIdentifiers;
 		xmlTask.resourceClaims = constructXMLResourceClaims(task);
 		xmlTask.materialClaims = constructXMLMaterialClaims(task);
 		xmlTask.shortestDuration = task.shortestDuration;
@@ -91,14 +95,14 @@ class SimpleXMLTask {
  	// --------------------------------------------------------------------------------	
 
 	static Task constructTask (SimpleXMLTask xmlTask) {
-		Task task = new Task(xmlTask.name);
+		Task task = new Task(xmlTask.identifier);
 		
-//		task.name = xmlTask.name;
+		task.name = xmlTask.name;
 		task.description = xmlTask.name;
 		task.kind = xmlTask.kind;
 		task.varianceReason = xmlTask.varianceReason;
-		task.predecessorNames = xmlTask.predecessorNames;
-		task.successorNames = xmlTask.successorNames;	
+		task.predecessorIdentifiers = xmlTask.predecessorIdentifiers;
+		task.successorIdentifiers = xmlTask.successorIdentifiers;	
 		task.resourceClaims = constructResourceClaims(xmlTask);
 		task.materialClaims = constructMaterialClaims(xmlTask);		
 		task.shortestDuration = xmlTask.shortestDuration;

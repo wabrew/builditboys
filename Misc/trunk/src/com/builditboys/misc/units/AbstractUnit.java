@@ -13,7 +13,7 @@ public abstract class AbstractUnit {
 	//--------------------------------------------------------------------------------
 	// Statics
 	
-	protected static enum UnitKindEnum { 
+	protected static enum UnitKindEnum {
 		TIME(SECOND),
 		LENGTH(METER),
 		AREA(null),
@@ -73,18 +73,20 @@ public abstract class AbstractUnit {
 		this.conversionFactor = conversionFactor;	
 		this.baseUnit = baseUnit;
 		
+//		System.out.println("making " + name);
 		unitNameMap.put(name, this);
 	}
-	
+		
 	//--------------------------------------------------------------------------------
 	// Lookup
 	
 	public static AbstractUnit getUnitNamed(String name) {
 		AbstractUnit unit = unitNameMap.get(name);
+//		System.out.println("looking for " + name + " " + unit);
 		if (unit == null) {
 			throw new IllegalArgumentException("No unit named " + name);
 		}
-		return unitNameMap.get(name);
+		return unit;
 	}
 	
 	//--------------------------------------------------------------------------------
@@ -170,6 +172,36 @@ public abstract class AbstractUnit {
 		return quot;
 	}
 	
+	public static float convert (float val, AbstractUnit fromUnit, AbstractUnit toUnit) {
+		// same unit, no conversion necessary
+		if (fromUnit == toUnit) {
+			return val;
+		}
+		
+		prepareConversion(fromUnit, toUnit);
+
+		double fromConversionFactor = fromUnit.derivedBaseConversionFactor;
+		double toConversionFactor = toUnit.derivedBaseConversionFactor;
+
+		// same conversion factor, no conversion necessary
+		if (fromConversionFactor == toConversionFactor) {
+			return val;
+		}
+
+		// do the conversion
+		double prod;
+		double quot;
+		prod = val;
+		if (fromConversionFactor != 1.0) {
+			prod = prod * fromConversionFactor;
+		}
+		quot = prod;
+		if (toConversionFactor != 1.0) {
+			quot = quot / toConversionFactor;
+		}
+		return (float) quot;
+	}
+
 	public static long convert (long val, AbstractUnit fromUnit, AbstractUnit toUnit) {
 		// same unit, no conversion necessary
 		if (fromUnit == toUnit) {

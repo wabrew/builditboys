@@ -19,7 +19,7 @@ public class LengthUnits extends AbstractUnit {
 			new LengthUnits("micrometer", "micrometers", "um", 1.0E-6, METER);
 	
 	public static final LengthUnits KILOMETER = 
-			new LengthUnits("KILOMETER", "kilometers", "km", 1.0E3, METER);
+			new LengthUnits("kilometer", "kilometers", "km", 1.0E3, METER);
 	
 	
 	public static final LengthUnits FOOT =
