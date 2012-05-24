@@ -77,7 +77,7 @@ public class Task {
 	long nominalDuration = -1;
 	long longestDuration = -1;
 
-	boolean hasAfterFinishConstrint = false;
+	boolean hasAfterFinishConstraint = false;
 	long afterFinishMaxWait;
 
 	
@@ -341,11 +341,11 @@ public class Task {
 	// ----------
 
 	public boolean hasAfterFinishConstrint() {
-		return hasAfterFinishConstrint;
+		return hasAfterFinishConstraint;
 	}
 
 	public void setHasAfterFinishConstrint(boolean hasAfterFinishConstrint) {
-		this.hasAfterFinishConstrint = hasAfterFinishConstrint;
+		this.hasAfterFinishConstraint = hasAfterFinishConstrint;
 		handleChange(TaskActionEnum.AFTER_FINISH_MAX_WAIT);
 	}
 
@@ -766,6 +766,17 @@ public class Task {
 					       + showableTime(latestFinishTime) + " / "
 					       + showableTime(actualFinishTime) + "   "
 					       + getNominalFinishTimeString(TimeAdjustmentEnum.RELATIVE));
+		System.out.println(prefixn + " " + "Has finish constraint: " + hasAfterFinishConstraint);
+		System.out.println(prefixn + " " + "After finish wait: " + afterFinishMaxWait);
+		System.out.println(prefixn + " " + "Resource claims:");
+		for (ResourceClaim claim: resourceClaims) {
+			System.out.println(prefixn + "   " + claim.amount + " " + claim.resourceName);
+		}
+		System.out.println(prefixn + " " + "Material claims:");
+		for (MaterialClaim claim: materialClaims) {
+			System.out.println(prefixn + "   " + claim.amount + " " + claim.units.plural + " " + claim.materialName);
+		}
+
 	}
 
 }

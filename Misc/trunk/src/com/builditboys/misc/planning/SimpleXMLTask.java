@@ -70,7 +70,7 @@ class SimpleXMLTask {
 		xmlTask.shortestDuration = task.shortestDuration;
 		xmlTask.nominalDuration = task.nominalDuration;
 		xmlTask.longestDuration = task.longestDuration;
-		xmlTask.hasAfterFinishConstrint = task.hasAfterFinishConstrint;
+		xmlTask.hasAfterFinishConstrint = task.hasAfterFinishConstraint;
 		xmlTask.afterFinishMaxWait = task.afterFinishMaxWait;
 
 		return xmlTask;
@@ -108,7 +108,7 @@ class SimpleXMLTask {
 		task.shortestDuration = xmlTask.shortestDuration;
 		task.nominalDuration = xmlTask.nominalDuration;
 		task.longestDuration = xmlTask.longestDuration;
-		task.hasAfterFinishConstrint = xmlTask.hasAfterFinishConstrint;
+		task.hasAfterFinishConstraint = xmlTask.hasAfterFinishConstrint;
 		task.afterFinishMaxWait = xmlTask.afterFinishMaxWait;
 
 		return task;

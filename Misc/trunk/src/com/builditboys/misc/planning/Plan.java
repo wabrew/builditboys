@@ -443,8 +443,7 @@ public class Plan {
 			for (String nm : tsk.predecessorIdentifiers) {
 				candidate = taskLookup.get(nm);
 				if (candidate == null) {
-					throw new IllegalStateException("Bad predecessor name "
-													+ tsk.identifier + " / " + nm);
+					throw new IllegalStateException("Task " + tsk.identifier + ": Bad predecessor name " + nm);
 				} else {
 					tsk.predecessors.add(candidate);
 // don't disturb user specified information
@@ -678,7 +677,7 @@ public class Plan {
 
 	void verifyConstraints() {
 		for (Task tsk: allTasks) {
-			if (tsk.hasAfterFinishConstrint) {
+			if (tsk.hasAfterFinishConstraint) {
 				long thisFinish = tsk.nominalFinishTime;
 				long maxWait = tsk.afterFinishMaxWait;
 				for (Task succ: tsk.successors) {
