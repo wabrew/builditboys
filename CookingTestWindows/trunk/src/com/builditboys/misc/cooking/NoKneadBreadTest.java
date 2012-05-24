@@ -2,7 +2,6 @@ package com.builditboys.misc.cooking;
 
 import com.builditboys.misc.planning.Plan;
 import com.builditboys.misc.planning.Task;
-import static com.builditboys.misc.planning.Task.*;
 
 
 public class NoKneadBreadTest {
