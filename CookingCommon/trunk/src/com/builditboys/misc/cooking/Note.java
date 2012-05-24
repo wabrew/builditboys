@@ -1,6 +1,7 @@
 package com.builditboys.misc.cooking;
 
 import java.util.Comparator;
+import java.util.Formatter;
 
 
 class Note {
@@ -48,7 +49,8 @@ class Note {
 	// --------------------------------------------------------------------------------
 
 	public String toString () {
-		return "Note: " + who + ", " + when + ", " + text;
+		Formatter formatter = new Formatter();
+		return "Note: " + who + ", " + formatter.format("%tc", when) + ", " + text;
 	}
 	
 }

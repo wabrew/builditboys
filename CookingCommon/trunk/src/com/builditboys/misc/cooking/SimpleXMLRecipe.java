@@ -52,7 +52,6 @@ class SimpleXMLRecipe {
 	
 
 	static Serializer serializer = new Persister();
-	static File recipeFolder = new File("Z:/Users/Bill/recipes");
 	
 	// Hack, when reading a recipe file, you need to be able to lookup units.
 	// However, the class loader might not have loaded the appropriate units
@@ -66,12 +65,12 @@ class SimpleXMLRecipe {
 	// --------------------------------------------------------------------------------
 	// Input
 	
-	static Recipe restoreRecipe (String fileName) throws Exception {
-		SimpleXMLRecipe xmlRecipe = read(fileName);
+	static Recipe restoreRecipe (File recipeFolder, String fileName) throws Exception {
+		SimpleXMLRecipe xmlRecipe = read(recipeFolder, fileName);
 		return constructRecipe(xmlRecipe);
 	}
 	
-	static SimpleXMLRecipe read (String fileName) throws Exception {
+	static SimpleXMLRecipe read (File recipeFolder, String fileName) throws Exception {
 		File file = new File(recipeFolder, fileName);
 		return serializer.read(SimpleXMLRecipe.class, file);		
 	}
@@ -79,12 +78,12 @@ class SimpleXMLRecipe {
 	// --------------------------------------------------------------------------------
 	// Output
 	
-	static void saveRecipe (Recipe recipe, String fileName) throws Exception {
+	static void saveRecipe (Recipe recipe, File recipeFolder, String fileName) throws Exception {
 		SimpleXMLRecipe xmlRecipe = constructXMLRecipe(recipe);
-		write(xmlRecipe, fileName);
+		write(xmlRecipe, recipeFolder, fileName);
 	}
 
-	static void write (SimpleXMLRecipe xmlRecipe, String fileName) throws Exception {
+	static void write (SimpleXMLRecipe xmlRecipe, File recipeFolder, String fileName) throws Exception {
 		File file = new File(recipeFolder, fileName);
 		serializer.write(xmlRecipe, file);
 	}
