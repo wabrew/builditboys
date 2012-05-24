@@ -1,5 +1,6 @@
 package com.builditboys.misc.cooking;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -40,6 +41,11 @@ class Recipe {
 	// Files that have photos of the recipe
 	List<Photo> photos = new ArrayList<Photo>();
 	
+	
+	
+	static File recipeFolder = new File("F:/Our-Top-While-Traveling/Users/Bill/recipes");
+//	static File recipeFolder = new File("Z:/Users/Bill/recipes");
+
 
 	// --------------------------------------------------------------------------------
 	// Constructors
@@ -52,11 +58,11 @@ class Recipe {
 	// Save / restore
 	
 	void save(String fileName) throws Exception {
-		SimpleXMLRecipe.saveRecipe(this, fileName);
+		SimpleXMLRecipe.saveRecipe(this, recipeFolder, fileName);
 	}
 
 	static Recipe restore(String fileName) throws Exception {
-		return SimpleXMLRecipe.restoreRecipe(fileName);
+		return SimpleXMLRecipe.restoreRecipe(recipeFolder, fileName);
 	}
 	
 
